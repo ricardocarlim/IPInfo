@@ -26,12 +26,9 @@ The **Unit of Work** pattern is used to group related operations into a single t
 
 To run the project, simply open it with **Visual Studio** and run it.
 
-## Logo Handling
-
-The logo is always saved as **base64** in a text field in the database to avoid increasing its size. This decision was made due to the lack of a blob storage service that provides us with a URL for image uploads.
-
 ## Important Notes
 
 - Always follow the **standards** and **frameworks** used in this project.
 - Respect the **couplings** and **structure** of the codebase.
+- Warning: Database and Redis connection information are stored in the appsettings.json file. Please ensure that sensitive data such as connection strings are secured properly, especially in production environments.
 
