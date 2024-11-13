@@ -57,14 +57,17 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 #endregion
 
 #region Redis Configuration
-var redisConnection = "localhost:6379";
+var redisConfig = builder.Configuration.GetSection("Redis");
+
+var redisConnection = redisConfig["ConnectionString"];
+var instanceName = redisConfig["InstanceName"];
 
 builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnection));
 
 builder.Services.AddStackExchangeRedisCache(options =>
 {
-    options.Configuration = redisConnection;  // Define o servidor Redis
-    options.InstanceName = "SampleInstance:";  // Define o prefixo para chaves armazenadas    
+    options.Configuration = redisConnection;  
+    options.InstanceName = instanceName;      
 });
 #endregion
 
