@@ -1,0 +1,65 @@
+﻿@page "{id:int}"
+@model EditarModel
+@{
+    ViewData["Title"] = "Editar Cliente";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post" enctype="multipart/form-data">    
+    <div class="form-group">
+        <label asp-for="Cliente.nome"></label>
+        <input asp-for="Cliente.nome" required="true" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Cliente.email"></label>
+        <input asp-for="Cliente.email" required="true" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="Cliente.imagem">Logotipo</label>
+        <input type="file" asp-for="Cliente.imagem" class="form-control" />
+        <input type="hidden" asp-for="Cliente.logotipo" class="form-control" />
+        <input type="hidden" asp-for="Cliente.id" class="form-control" />
+        <input type="hidden" asp-for="Cliente.logradouros" class="form-control" />
+    </div>
+    
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Logradouros</th>
+                <th></th>
+                <th></th>
+            </tr>           
+        </thead>
+        <tbody>
+            <tr>
+                <td>
+                    <a href="/Logradouro/Editar?id=0&ClienteId=@Model.Cliente.id&endereco=">Novo Logradouro</a>
+                </td>
+                <td></td>
+                <td></td>
+            </tr>
+            @foreach (var logradouro in Model.Cliente.logradouros)
+            {
+                <tr>
+                    <td>
+                        <p>@logradouro.endereco</p>
+                    </td>
+                    <td>
+                        <a asp-page="/Logradouro/Editar" asp-route-id="@logradouro.id" asp-route-ClienteId="@Model.Cliente.id" asp-route-endereco="@logradouro.endereco">Editar</a> |
+                        <a asp-page-handler="Excluir" asp-route-id="@logradouro.id" asp-route-ClienteId="@Model.Cliente.id">Excluir</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-danger">
+            @Html.ValidationSummary()
+        </div>
+    }
+
+    <button type="submit" class="btn btn-primary">Salvar</button>
+</form>

@@ -1,0 +1,18 @@
+﻿@page 
+@model app.Pages.Logradouro.EditarModel
+@{
+    ViewData["Title"] = "Editar Logradouro";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label asp-for="Logradouro.endereco"></label>
+        <input asp-for="Logradouro.endereco" class="form-control" required="true" />
+        <input type="hidden" asp-for="Logradouro.ClienteId" class="form-control" />
+        <input type="hidden" asp-for="Logradouro.id" class="form-control" />
+    </div>    
+    <button type="submit" class="btn btn-primary">Salvar</button>
+</form>
+
