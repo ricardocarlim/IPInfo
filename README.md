@@ -1,4 +1,5 @@
 
+```markdown
 # Project Architecture, Design Patterns, and Best Practices
 
 This section provides an in-depth analysis of the architecture, design patterns used, and the rationale behind their adoption. The aim is to ensure that the development practices align with technical requirements while promoting flexibility, scalability, and maintainability.
@@ -158,6 +159,7 @@ public async Task AddAsync_ShouldAddIPAddressToDatabase()
     Assert.Equal("192.168.1.1", addedIPAddress.IP);
     Assert.Equal("Brazil", addedIPAddress.Country.Name);
 }
+```
 
 ### 5.2 **CountryRepositoryTests**
 
@@ -180,6 +182,7 @@ public async Task ListByNameAsync_ShouldReturnCountries_WhenExists()
     Assert.Single(countries);
     Assert.Equal("Brazil", countries.First().Name);
 }
+```
 
 ### 5.3 **IP2CServiceTests**
 
@@ -195,6 +198,7 @@ public async Task GetCountryInfoFromIPAsync_ShouldReturnCountry_WhenValidIP()
     Assert.NotNull(result);
     Assert.Equal("United States", result.Country.Name);
 }
+```
 
 ---
 
@@ -205,4 +209,4 @@ The architecture adopted for this project combines the best practices of **DDD**
 Additionally, the caching infrastructure and use of **Hangfire** for background tasks contribute to the application's performance and scalability, ensuring that it can handle high data volumes efficiently. The code is designed to be easily extended and modified, ensuring the system's sustainability in the long term.
 
 ---
-
+```
