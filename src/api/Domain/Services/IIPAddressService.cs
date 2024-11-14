@@ -11,7 +11,5 @@ namespace api.Domain.Services
         Task<Country> FindCountryInIP2CByIPAsync(string ip);
         Task<IPAddress> FindByIPAsync(IPAddressQuery ipAddressQuery);
         Task<IPAddressResponse> SaveAsync(Models.IPAddress ipAddress);
-        Task<IPAddressResponse> UpdateAsync(Models.IPAddress ipAddress);
-        Task<IPAddressResponse> DeleteAsync(string ip);
     }
 }

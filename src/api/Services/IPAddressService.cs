@@ -96,55 +96,7 @@ namespace api.Services
                 _logger.LogError($"Error saving IP address: {ex.Message}");
                 return new IPAddressResponse($"Error saving IP address: {ex.Message}");
             }
-        }
-
-        public async Task<IPAddressResponse> UpdateAsync(IPAddress ipAddress)
-        {
-            try
-            {
-                var existingIp = await _ipAddressRepository.FindByIPAsync(ipAddress.IP);
-                if (existingIp == null)
-                    return new IPAddressResponse("IP address not found");
-
-                existingIp.IP = ipAddress.IP;
-                existingIp.Country = ipAddress.Country;
-                existingIp.UpdatedAt = DateTime.UtcNow;
-
-                _ipAddressRepository.Update(existingIp);
-                await _unitOfWork.CompleteAsync();
-
-                await _cacheService.AddIPToCacheAsync(existingIp.IP, existingIp);
-
-                return new IPAddressResponse(existingIp);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error updating IP address: {ex.Message}");
-                return new IPAddressResponse($"Error updating IP address: {ex.Message}");
-            }
-        }
-
-        public async Task<IPAddressResponse> DeleteAsync(string ip)
-        {
-            try
-            {
-                var ipAddress = await _ipAddressRepository.FindByIPAsync(ip);
-                if (ipAddress == null)
-                    return new IPAddressResponse("IP address not found");
-
-                _ipAddressRepository.Remove(ipAddress);
-                await _unitOfWork.CompleteAsync();
-
-                await _cacheService.RemoveIPFromCacheAsync(ipAddress.IP);
-
-                return new IPAddressResponse(ipAddress);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError($"Error deleting IP address: {ex.Message}");
-                return new IPAddressResponse($"Error deleting IP address: {ex.Message}");
-            }
-        }
+        }  
 
         private async Task<Domain.Models.IPAddress> TryFindInCache(string ip)
         {

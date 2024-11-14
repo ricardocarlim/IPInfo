@@ -24,23 +24,6 @@ namespace api.Persistence.Repositories
                             .FirstOrDefaultAsync();
 
             return ret;
-        }
-
-        public Task<QueryResult<Domain.Models.IPAddress>> ListAsync(IPAddressQuery query)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Remove(Domain.Models.IPAddress ipaddress)
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Domain.Models.IPAddress ipaddress)
-        {
-            throw new NotImplementedException();
-        }
-
-       
+        }               
     }
 }
