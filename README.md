@@ -108,15 +108,6 @@ switch (result[0])
 }
 ```
 
-### 2.6 **Decorator** (Possible Future Use)
-**Pattern Potential**: **Decorator** for adding additional functionality
-
-- **Where Could Be Used**: Although not explicitly implemented, the **Decorator** pattern could be useful for adding features like **logging** or **caching** transparently.
-
-- **Why Could Be Used**: The **Decorator** pattern allows additional functionalities to be applied to objects dynamically, without modifying the base classes. For example, a decorator could be added to log database access operations or apply caching without modifying the repository classes directly.
-
----
-
 ## 3. **Clean Code and TDD Practices**
 
 ### 3.1 **Clean Code**
