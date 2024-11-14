@@ -1,6 +1,3 @@
-Certainly! Here's the translation and edit for inclusion in the `README.md` file of your GitHub project.
-
----
 
 # Project Architecture, Design Patterns, and Best Practices
 
