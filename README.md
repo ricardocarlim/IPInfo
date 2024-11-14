@@ -132,7 +132,73 @@ switch (result[0])
 
 ---
 
-## 5. **Conclusion**
+## 5. **Unit Tests**
+
+Unit tests are crucial to ensure the functionality of the application. Below are some examples of unit tests for repositories and services:
+
+### 5.1 **IPAddressRepositoryTests**
+
+Test for adding an IP address to the repository:
+
+```csharp
+[Fact]
+public async Task AddAsync_ShouldAddIPAddressToDatabase()
+{
+    var ipAddress = new IPAddress
+    {
+        IP = "192.168.1.1",
+        Country = new Country { Name = "Brazil", ThreeLetterCode = "BRA", TwoLetterCode = "BR" }
+    };
+
+    var repository = CreateRepository();
+    var addedIPAddress = await repository.AddAsync(ipAddress);
+    await _context.SaveChangesAsync();
+    
+    Assert.NotNull(addedIPAddress);
+    Assert.Equal("192.168.1.1", addedIPAddress.IP);
+    Assert.Equal("Brazil", addedIPAddress.Country.Name);
+}
+
+### 5.2 **CountryRepositoryTests**
+
+Test for listing a country by name:
+
+```csharp
+[Fact]
+public async Task ListByNameAsync_ShouldReturnCountries_WhenExists()
+{
+    var brazil = new Country { Name = "Brazil", ThreeLetterCode = "BRA", TwoLetterCode = "BR" };
+    var argentina = new Country { Name = "Argentina", ThreeLetterCode = "ARG", TwoLetterCode = "AR" };
+
+    _context.Countries.Add(brazil);
+    _context.Countries.Add(argentina);
+    await _context.SaveChangesAsync();
+
+    var repository = CreateRepository();
+    var countries = await repository.ListByNameAsync("Brazil");
+
+    Assert.Single(countries);
+    Assert.Equal("Brazil", countries.First().Name);
+}
+
+### 5.3 **IP2CServiceTests**
+
+Test for IP-to-country lookup:
+
+```csharp
+[Fact]
+public async Task GetCountryInfoFromIPAsync_ShouldReturnCountry_WhenValidIP()
+{
+    var ip = "8.8.8.8";
+    var result = await _ip2CService.GetCountryInfoFromIPAsync(ip);
+
+    Assert.NotNull(result);
+    Assert.Equal("United States", result.Country.Name);
+}
+
+---
+
+## 6. **Conclusion**
 
 The architecture adopted for this project combines the best practices of **DDD**, **Clean Code**, **TDD**, and design patterns, resulting in a decoupled, flexible, and maintainable system. The use of patterns like **Unit of Work**, **Repository**, **Factory**, **Singleton**, and **Strategy** provides flexibility, scalability, and ease of maintenance. These patterns were selected to address specific problems, such as ensuring transactional consistency, abstracting data access, managing complex object creation, and allowing the system to adapt to different API responses.
 
