@@ -1,7 +1,11 @@
-﻿namespace api.Domain.Repositories
+﻿using StackExchange.Redis;
+
+namespace api.Domain.Repositories
 {
     public interface IUnitOfWork
-    {
-        Task CompleteAsync();
+    {        
+        Task<ITransaction> BeginTransactionAsync();        
+        Task CompleteAsync();        
+        Task RollbackAsync();
     }
 }

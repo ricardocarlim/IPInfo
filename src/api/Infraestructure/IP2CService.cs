@@ -1,49 +1,65 @@
 ﻿using System.Net;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace api.Infraestructure
 {
     public static class IP2CService
     {
+        private const string ApiUrlTemplate = "http://ip2c.org/{0}";
+
         public static async Task<Domain.Models.Country> GetCountryInfoFromIPAsync(string ip)
         {
-            var country = new Domain.Models.Country();
-            string url = $"http://ip2c.org/{ip}";
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
-
             try
             {
-                using (WebResponse response = await request.GetResponseAsync())
-                using (Stream responseStream = response.GetResponseStream())
-                using (StreamReader reader = new StreamReader(responseStream))
-                {
-                    string result = await reader.ReadToEndAsync();
+                var result = await GetApiResponseAsync(ip);
 
-                    switch (result[0])
-                    {
-                        case '0':
-                            return null;                            
-                        case '1':
-                            string[] reply = result.Split(';');                            
-                            country.ThreeLetterCode = reply[2];
-                            country.TwoLetterCode = reply[1];
-                            country.Name = reply[3];
-                            country.CreatedAt = DateTime.Now;
+                if (string.IsNullOrEmpty(result))
+                    return null;
 
-                            break;
-                        case '2':
-                            return null;                            
-                        default:
-                            return null;                            
-                    }
-                }
+                return ParseCountryInfo(result);
             }
-            catch (WebException ex)
+            catch (WebException)
             {
                 return null;
             }
+        }
 
-            return country;
+        private static async Task<string> GetApiResponseAsync(string ip)
+        {
+            string url = string.Format(ApiUrlTemplate, ip);
+            HttpWebRequest request = CreateRequest(url);
+
+            using (WebResponse response = await request.GetResponseAsync())
+            using (Stream responseStream = response.GetResponseStream())
+            using (StreamReader reader = new StreamReader(responseStream))
+            {
+                return await reader.ReadToEndAsync();
+            }
+        }
+
+        private static HttpWebRequest CreateRequest(string url)
+        {
+            var request = (HttpWebRequest)WebRequest.Create(url);
+            request.CachePolicy = new System.Net.Cache.RequestCachePolicy(System.Net.Cache.RequestCacheLevel.NoCacheNoStore);
+            return request;
+        }
+
+        private static Domain.Models.Country ParseCountryInfo(string result)
+        {
+            if (result[0] == '1')
+            {
+                string[] reply = result.Split(';');
+                return new Domain.Models.Country
+                {
+                    ThreeLetterCode = reply[2],
+                    TwoLetterCode = reply[1],
+                    Name = reply[3],
+                    CreatedAt = DateTime.Now
+                };
+            }
+
+            return null;
         }
     }
 }

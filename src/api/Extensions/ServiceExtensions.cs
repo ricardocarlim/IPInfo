@@ -55,15 +55,23 @@ namespace api.Extensions
 
         public static void ConfigureDependencyInjection(this IServiceCollection services)
         {
+            // Repositórios
             services.AddScoped<IIPAddressRepository, IPAddressRepository>();
-            services.AddScoped<IIPAddressService, IPAddressService>();
             services.AddScoped<IIPUpdateRepository, IPUpdateRepository>();
-            services.AddScoped<IIPUpdateService, IPUpdateService>();
             services.AddScoped<ICountryRepository, CountryRepository>();
-            services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<IReportRepository, ReportRepository>();
+
+            // Serviços
+            services.AddScoped<IIPAddressService, IPAddressService>();
+            services.AddScoped<IIPUpdateService, IPUpdateService>();
+            services.AddScoped<ICountryService, CountryService>();
             services.AddScoped<IReportService, ReportService>();
-            services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+            // Injeção de dependência para UnitOfWork e Transaction
+            services.AddScoped<IUnitOfWork, UnitOfWork>(); // Registra o UnitOfWork
+            services.AddScoped<Domain.Repositories.ITransaction, Transaction>(); // Registra o Transaction
+
+            // Outros
             services.AddSingleton<IP2CCacheService>();
         }
 

@@ -7,12 +7,9 @@ using api.Infraestructure;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
-using Microsoft.VisualBasic;
 using StackExchange.Redis;
 using System;
-using System.Data;
 using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace api.Services
 {
@@ -49,11 +46,11 @@ namespace api.Services
 
         public async Task<IPAddress> FindByIPAsync(IPAddressQuery ipAddressQuery)
         {
-            var ipAddress = await TryFindInCache(ipAddressQuery.IP);
+            var ipAddress = await FindInCacheByIPAsync(ipAddressQuery.IP);
             if (ipAddress != null)
                 return ipAddress;
 
-            ipAddress = await TryFindInDB(ipAddressQuery.IP);
+            ipAddress = await FindInDBByIPAsync(ipAddressQuery.IP);
             if (ipAddress != null)
             {
                 await _cacheService.AddIPToCacheAsync(ipAddressQuery.IP, ipAddress);
@@ -82,35 +79,46 @@ namespace api.Services
         {
             try
             {
-                ipAddress.CreatedAt = DateTime.UtcNow;
-                ipAddress.UpdatedAt = DateTime.UtcNow.AddYears(-100);
-                ipAddress = await _ipAddressRepository.AddAsync(ipAddress);
-                await _unitOfWork.CompleteAsync();
+                using (var transaction = await _unitOfWork.BeginTransactionAsync())
+                {
+                    ipAddress = PrepareNewIPAddress(ipAddress);
+                    ipAddress = await SaveToDatabase(ipAddress);
+                    await SaveToCache(ipAddress);
+                    await _unitOfWork.CompleteAsync();
 
-                await _cacheService.AddIPToCacheAsync(ipAddress.IP, ipAddress);
+                    await transaction.CommitAsync();
 
-                return new IPAddressResponse(ipAddress);
+                    return new IPAddressResponse(ipAddress);
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError($"Error saving IP address: {ex.Message}");
+                await _unitOfWork.RollbackAsync();
                 return new IPAddressResponse($"Error saving IP address: {ex.Message}");
             }
-        }  
-
-        private async Task<Domain.Models.IPAddress> TryFindInCache(string ip)
-        {
-            return await _cacheService.GetIPFromCacheAsync(ip);
         }
 
-        private async Task<Domain.Models.IPAddress> TryFindInDB(string ip)
+        private IPAddress PrepareNewIPAddress(IPAddress ipAddress)
         {
-            return await _ipAddressRepository.FindByIPAsync(ip);
+            ipAddress.CreatedAt = DateTime.UtcNow;
+            ipAddress.UpdatedAt = DateTime.UtcNow.AddYears(-100);
+            return ipAddress;
         }
 
-        private async Task<Domain.Models.IPAddress> CreateNewIPAddress(string ip)
+        private async Task<IPAddress> SaveToDatabase(IPAddress ipAddress)
         {
-            var ipAddress = new Domain.Models.IPAddress
+            return await _ipAddressRepository.AddAsync(ipAddress);
+        }
+
+        private async Task SaveToCache(IPAddress ipAddress)
+        {
+            await _cacheService.AddIPToCacheAsync(ipAddress.IP, ipAddress);
+        }
+
+        private async Task<IPAddress> CreateNewIPAddress(string ip)
+        {
+            var ipAddress = new IPAddress
             {
                 IP = ip,
                 Country = await FindCountry(ip)
@@ -137,11 +145,9 @@ namespace api.Services
             {
                 var existingCountry = await _countryService.ListByNameAsync(country.Name);
                 return existingCountry ?? await _countryService.SaveAsync(country);
-            }else
-            {
-                throw new KeyNotFoundException("Country information not found for the specified IP.");
             }
-            
+
+            throw new KeyNotFoundException("Country information not found for the specified IP.");
         }
     }
 }
