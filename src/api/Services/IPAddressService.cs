@@ -77,19 +77,17 @@ namespace api.Services
 
         public async Task<IPAddressResponse> SaveAsync(IPAddress ipAddress)
         {
+            await _unitOfWork.BeginTransactionAsync();
             try
             {
-                using (var transaction = await _unitOfWork.BeginTransactionAsync())
-                {
-                    ipAddress = PrepareNewIPAddress(ipAddress);
-                    ipAddress = await SaveToDatabase(ipAddress);
-                    await SaveToCache(ipAddress);
-                    await _unitOfWork.CompleteAsync();
+                ipAddress = PrepareNewIPAddress(ipAddress);
+                ipAddress = await SaveToDatabase(ipAddress);
+                await SaveToCache(ipAddress);
+                await _unitOfWork.CompleteAsync();
 
-                    await transaction.CommitAsync();
+                await _unitOfWork.CommitAsync();
 
-                    return new IPAddressResponse(ipAddress);
-                }
+                return new IPAddressResponse(ipAddress);
             }
             catch (Exception ex)
             {

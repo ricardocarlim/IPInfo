@@ -1,30 +1,32 @@
 ﻿using api.Domain.Repositories;
+using api.Persistence.Contexts;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace api.Persistence.Repositories
 {
-    public class Transaction : ITransaction, IDisposable
+    public class Transaction : ITransaction
     {
-        private readonly IDbContextTransaction _dbContextTransaction;
+        private readonly AppDbContext _context;
+        private IDbContextTransaction _transaction;
 
-        public Transaction(IDbContextTransaction dbContextTransaction)
+        public Transaction(AppDbContext context)
         {
-            _dbContextTransaction = dbContextTransaction;
+            _context = context;
+        }
+        
+        public async Task BeginTransactionAsync()
+        {
+            _transaction = await _context.Database.BeginTransactionAsync();
         }
 
         public async Task CommitAsync()
         {
-            await _dbContextTransaction.CommitAsync();
+            await _transaction.CommitAsync();
         }
 
         public async Task RollbackAsync()
         {
-            await _dbContextTransaction.RollbackAsync();
-        }
-        
-        public void Dispose()
-        {
-            _dbContextTransaction?.Dispose();
+            await _transaction.RollbackAsync();
         }
     }
 }

@@ -115,7 +115,7 @@ namespace Tests.Repositories
             
             var existingIPAddress = await repository.FindByIPAsync("192.168.1.1");
             existingIPAddress.Country.Name = "Updated Brazil";
-            await repository.SaveAsync(existingIPAddress);
+            await repository.AddAsync(existingIPAddress);
             await _context.SaveChangesAsync();
             
             var updatedIPAddress = await _context.IPAddresses

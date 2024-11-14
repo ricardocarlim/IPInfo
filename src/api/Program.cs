@@ -10,9 +10,9 @@ builder.Services.AddControllers();
 builder.Services.AddOptions();
 builder.Services.ConfigureCors();
 builder.Services.ConfigureSwagger();
+builder.Services.ConfigureDependencyInjection();
 builder.Services.ConfigureDatabase(builder.Configuration);
 builder.Services.ConfigureRedis(builder.Configuration);
-builder.Services.ConfigureDependencyInjection();
 builder.Services.ConfigureHangfire(builder.Configuration);
 
 var app = builder.Build();

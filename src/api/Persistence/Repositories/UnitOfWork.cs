@@ -1,34 +1,39 @@
 ﻿using api.Domain.Repositories;
 using api.Persistence.Contexts;
-using Microsoft.EntityFrameworkCore.Storage;
 
 namespace api.Persistence.Repositories
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly AppDbContext _context;
-        private IDbContextTransaction _transaction;
+        private readonly ITransaction _transaction;
 
-        public UnitOfWork(AppDbContext context)
+        public UnitOfWork(AppDbContext context, ITransaction transaction)
         {
             _context = context;
+            _transaction = transaction;
         }
 
-        public async Task<ITransaction> BeginTransactionAsync()
+        // Inicia uma nova transação
+        public async Task BeginTransactionAsync()
         {
-            _transaction = await _context.Database.BeginTransactionAsync();
-            return new Transaction(_transaction);
+            await _transaction.BeginTransactionAsync();
+        }
+
+        public async Task CommitAsync()
+        {
+            await _transaction.CommitAsync();
         }
 
         public async Task CompleteAsync()
         {
             await _context.SaveChangesAsync();
-            await _transaction.CommitAsync();
         }
 
         public async Task RollbackAsync()
         {
             await _transaction.RollbackAsync();
         }
+        
     }
 }

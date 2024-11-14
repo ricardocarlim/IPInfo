@@ -4,8 +4,9 @@ namespace api.Domain.Repositories
 {
     public interface IUnitOfWork
     {        
-        Task<ITransaction> BeginTransactionAsync();        
+        Task BeginTransactionAsync();        
         Task CompleteAsync();        
         Task RollbackAsync();
+        Task CommitAsync();
     }
 }

@@ -69,7 +69,7 @@ namespace api.Tests.Services
             var result = await _service.SaveAsync(ipAddress);
 
             Assert.NotNull(result);
-            Assert.Equal(ipAddress.IP, result.IP);
+            Assert.Equal(ipAddress.IP, result.IPAddress.IP);
             _mockIpAddressRepository.Verify(r => r.AddAsync(It.IsAny<IPAddress>()), Times.Once);
             _mockUnitOfWork.Verify(u => u.CompleteAsync(), Times.Once);
             _mockCacheService.Verify(c => c.AddIPToCacheAsync(It.IsAny<string>(), It.IsAny<IPAddress>()), Times.Once);

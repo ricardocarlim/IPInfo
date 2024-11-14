@@ -10,7 +10,7 @@ namespace api.Services
     {
         private readonly ICountryRepository _countryRepository;
         private readonly IUnitOfWork _unitOfWork;
-        
+
         public CountryService(ICountryRepository countryRepository, IUnitOfWork unitOfWork)
         {
             _countryRepository = countryRepository;
@@ -25,25 +25,26 @@ namespace api.Services
         public async Task<Country> SaveAsync(Country country)
         {
             try
-            {                
-                using (ITransaction transaction = await _unitOfWork.BeginTransactionAsync())
-                {
-                    var existingCountry = await _countryRepository.ListByNameAsync(country.Name);
+            {
+                // Inicia a transação usando o UnitOfWork, que já tem a implementação de Transaction
+                await _unitOfWork.BeginTransactionAsync();
 
-                    await _countryRepository.SaveAsync(country);
-                    
-                    await _unitOfWork.CompleteAsync();
-                    
-                    await transaction.CommitAsync();
+                var existingCountry = await _countryRepository.ListByNameAsync(country.Name);
 
-                    return country;
-                }
+                await _countryRepository.SaveAsync(country);
+                await _unitOfWork.CompleteAsync();
+
+                // Commit da transação
+                await _unitOfWork.CommitAsync();
+
+                return country;
             }
             catch (Exception ex)
-            {                
+            {
                 await _unitOfWork.RollbackAsync();
-                throw new Exception("Erro ao salvar o país", ex);
+                throw new Exception("Error saving country", ex);
             }
         }
+
     }
 }
